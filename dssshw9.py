@@ -2,13 +2,13 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-# Local path to the TinyLlama model files
+
 MODEL_PATH = r"C:\Users\rmukh\PycharmProjects\dssshw9\tinyllama"
 
 # Load the model and tokenizer from the local path
 tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
 if tokenizer.pad_token is None:
-    tokenizer.pad_token = tokenizer.eos_token  # Set pad_token to eos_token if not defined
+    tokenizer.pad_token = tokenizer.eos_token  
 model = AutoModelForCausalLM.from_pretrained(MODEL_PATH)
 
 # Function to generate a response using TinyLlama
@@ -22,11 +22,11 @@ def generate_response(prompt: str) -> str:
     # Tokenize the input with padding
     inputs = tokenizer(formatted_prompt, return_tensors="pt", padding=True)
 
-    # Use attention mask to inform the model about padding
+    
     input_ids = inputs["input_ids"]
     attention_mask = inputs["attention_mask"]
 
-    # Generate the response
+    
     outputs = model.generate(
         input_ids=input_ids,
         attention_mask=attention_mask,
@@ -37,20 +37,16 @@ def generate_response(prompt: str) -> str:
         repetition_penalty=1.2,
         pad_token_id=tokenizer.eos_token_id
     )
-
-    # Decode the generated response
+ 
     response = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-    # Remove the prompt context from the response (if present)
     response = response.replace(formatted_prompt, "").strip()
     return response
 
-# Method to handle sending messages
 async def send_message(update: Update, text: str) -> None:
     """Send a message to the user."""
     await update.message.reply_text(text)
 
-# Method to handle receiving and processing user messages
 async def receive_message(update: Update) -> str:
     """Receive and process a user's message."""
     user_message = update.message.text
@@ -67,7 +63,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     await send_message(update, response)
 
 def main():
-    # Replace with your Telegram bot token
     TELEGRAM_BOT_TOKEN = "7625144410:AAE1EUyZvL8fHYUzwfF9VftGBlka5TlIeCA"
 
     # Initialize the Telegram bot application
